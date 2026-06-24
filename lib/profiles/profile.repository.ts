@@ -5,9 +5,7 @@ type ProfileRow = Database["public"]["Tables"]["profiles"]["Row"];
 type ProfileUpdate = Database["public"]["Tables"]["profiles"]["Update"];
 
 export class ProfileRepository {
-  constructor(
-    private readonly supabase: SupabaseClient<Database>
-  ) {}
+  constructor(private readonly supabase: SupabaseClient<Database>) {}
 
   async findById(userId: string): Promise<ProfileRow | null> {
     const { data, error } = await this.supabase
@@ -27,7 +25,7 @@ export class ProfileRepository {
 
   async updateById(
     userId: string,
-    payload: ProfileUpdate
+    payload: ProfileUpdate,
   ): Promise<ProfileRow> {
     const { data, error } = await this.supabase
       .from("profiles")

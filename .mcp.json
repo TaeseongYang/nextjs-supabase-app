@@ -1,10 +1,10 @@
 {
-	"mcpServers": {
-		"supabase": {
-			"type": "http",
-			"url": "https://mcp.supabase.com/mcp?project_ref=aeydbqyasockwwhhvmkg"
-		},
-      "playwright": {
+  "mcpServers": {
+    "supabase": {
+      "type": "http",
+      "url": "https://mcp.supabase.com/mcp?project_ref=aeydbqyasockwwhhvmkg"
+    },
+    "playwright": {
       "type": "stdio",
       "command": "npx",
       "args": ["@playwright/mcp@latest"],
@@ -36,5 +36,5 @@
         "ENABLE_GUI": "True"
       }
     }
-	}
+  }
 }

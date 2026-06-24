@@ -1,3 +1,4 @@
+import Image from "next/image";
 import type { Database } from "@/lib/database.types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -16,13 +17,15 @@ export function ProfileCard({ profile }: ProfileCardProps) {
     <Card className="w-full max-w-md">
       <CardHeader className="flex flex-row items-center gap-4">
         {profile.avatar_url ? (
-          <img
+          <Image
             src={profile.avatar_url}
             alt={displayName}
-            className="w-16 h-16 rounded-full object-cover"
+            width={64}
+            height={64}
+            className="rounded-full object-cover"
           />
         ) : (
-          <div className="w-16 h-16 rounded-full bg-accent flex items-center justify-center text-2xl font-bold text-muted-foreground">
+          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-accent text-2xl font-bold text-muted-foreground">
             {initials}
           </div>
         )}
@@ -43,7 +46,9 @@ export function ProfileCard({ profile }: ProfileCardProps) {
         )}
         {profile.website && (
           <div>
-            <span className="font-semibold text-muted-foreground">웹사이트</span>
+            <span className="font-semibold text-muted-foreground">
+              웹사이트
+            </span>
             <a
               href={profile.website}
               target="_blank"
@@ -54,7 +59,7 @@ export function ProfileCard({ profile }: ProfileCardProps) {
             </a>
           </div>
         )}
-        <div className="text-xs text-muted-foreground border-t pt-3">
+        <div className="border-t pt-3 text-xs text-muted-foreground">
           가입일: {new Date(profile.created_at).toLocaleDateString("ko-KR")}
         </div>
       </CardContent>

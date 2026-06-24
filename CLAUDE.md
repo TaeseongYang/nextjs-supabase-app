@@ -75,12 +75,12 @@ NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=...
 
 ## 기술 스택 요약
 
-| 항목 | 버전/도구 |
-|------|-----------|
-| 프레임워크 | Next.js 15, React 19 |
-| 인증/DB | Supabase (`@supabase/ssr`) |
-| UI | shadcn/ui + Radix UI |
-| 스타일 | Tailwind CSS 3 |
-| 테마 | next-themes |
-| 아이콘 | lucide-react |
-| 유틸리티 | clsx + tailwind-merge (`cn()`) |
+| 항목       | 버전/도구                      |
+| ---------- | ------------------------------ |
+| 프레임워크 | Next.js 15, React 19           |
+| 인증/DB    | Supabase (`@supabase/ssr`)     |
+| UI         | shadcn/ui + Radix UI           |
+| 스타일     | Tailwind CSS 3                 |
+| 테마       | next-themes                    |
+| 아이콘     | lucide-react                   |
+| 유틸리티   | clsx + tailwind-merge (`cn()`) |

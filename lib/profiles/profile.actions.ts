@@ -15,7 +15,7 @@ async function createProfileServiceAsync() {
 }
 
 export async function getProfileAction(
-  userId: string
+  userId: string,
 ): Promise<{ data: ProfileRow | null; error: string | null }> {
   try {
     const service = await createProfileServiceAsync();
@@ -29,7 +29,7 @@ export async function getProfileAction(
 
 export async function updateProfileAction(
   userId: string,
-  payload: Omit<ProfileUpdate, "id" | "created_at" | "updated_at">
+  payload: Omit<ProfileUpdate, "id" | "created_at" | "updated_at">,
 ): Promise<{ data: ProfileRow | null; error: string | null }> {
   try {
     const service = await createProfileServiceAsync();

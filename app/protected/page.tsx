@@ -9,7 +9,8 @@ import { Suspense } from "react";
 async function ProfileSection() {
   const supabase = await createClient();
 
-  const { data: claimsData, error: authError } = await supabase.auth.getClaims();
+  const { data: claimsData, error: authError } =
+    await supabase.auth.getClaims();
   if (authError || !claimsData?.claims) {
     redirect("/auth/login");
   }
@@ -33,16 +34,22 @@ async function ProfileSection() {
 
 export default function ProtectedPage() {
   return (
-    <div className="flex-1 w-full flex flex-col gap-12">
+    <div className="flex w-full flex-1 flex-col gap-12">
       <div className="w-full">
-        <div className="bg-accent text-sm p-3 px-5 rounded-md text-foreground flex gap-3 items-center">
+        <div className="flex items-center gap-3 rounded-md bg-accent p-3 px-5 text-sm text-foreground">
           <InfoIcon size="16" strokeWidth={2} />
           로그인한 사용자만 볼 수 있는 보호된 페이지입니다.
         </div>
       </div>
       <div className="flex flex-col gap-4">
-        <h2 className="font-bold text-2xl">내 프로필</h2>
-        <Suspense fallback={<div className="text-sm text-muted-foreground">프로필 로딩 중...</div>}>
+        <h2 className="text-2xl font-bold">내 프로필</h2>
+        <Suspense
+          fallback={
+            <div className="text-sm text-muted-foreground">
+              프로필 로딩 중...
+            </div>
+          }
+        >
           <ProfileSection />
         </Suspense>
       </div>
