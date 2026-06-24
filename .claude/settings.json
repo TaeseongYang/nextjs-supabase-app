@@ -1,9 +1,0 @@
-{
-  "permissions": {
-    "allowlist": [
-      "npm",
-      "node",
-      "npx"
-    ]
-  }
-}

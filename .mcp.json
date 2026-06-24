@@ -1,8 +1,40 @@
 {
-  "mcpServers": {
-    "supabase": {
+	"mcpServers": {
+		"supabase": {
+			"type": "http",
+			"url": "https://mcp.supabase.com/mcp?project_ref=aeydbqyasockwwhhvmkg"
+		},
+      "playwright": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["@playwright/mcp@latest"],
+      "env": {}
+    },
+    "context7": {
       "type": "http",
-      "url": "https://mcp.supabase.com/mcp?project_ref=aeydbqyasockwwhhvmkg"
+      "url": "https://mcp.context7.com/mcp"
+    },
+    "sequential-thinking": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-sequential-thinking"]
+    },
+    "shadcn": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["shadcn@latest", "mcp"]
+    },
+    "shrimp-task-manager": {
+      "type": "stdio",
+      "command": "node",
+      "args": [
+        "C:/Users/user/23_my-workspace/mcp-shrimp-task-manager/dist/index.js"
+      ],
+      "env": {
+        "DATA_DIR": "C:/Users/user/26_invoice-web/shrimp_data",
+        "TEMPLATES_USE": "en",
+        "ENABLE_GUI": "True"
+      }
     }
-  }
+	}
 }
