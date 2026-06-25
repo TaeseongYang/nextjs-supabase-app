@@ -1,5 +1,5 @@
 import { AuthButton } from "@/components/auth-button";
-import { SidebarNav } from "@/components/sidebar-nav";
+import { BottomTabBar } from "@/components/bottom-tab-bar";
 import { ThemeSwitcher } from "@/components/theme-switcher";
 import Link from "next/link";
 import { Suspense } from "react";
@@ -11,37 +11,27 @@ export default function OrganizerLayout({
 }) {
   return (
     <div className="flex min-h-screen bg-muted/30">
-      {/* 사이드바 — 1024px 미만에서 숨김 */}
-      <aside className="fixed inset-y-0 hidden flex-col border-r bg-background lg:flex lg:w-60">
-        <div className="flex h-16 items-center border-b px-6">
-          <Link href="/" className="text-lg font-bold tracking-tight">
-            모임
-          </Link>
-        </div>
-        <SidebarNav />
-        <div className="flex items-center justify-center border-t p-4">
-          <ThemeSwitcher />
-        </div>
-      </aside>
-
-      {/* 사이드바 너비만큼 오프셋 */}
-      <div className="flex flex-1 flex-col lg:pl-60">
+      <div className="flex-1">
         {/* 모바일 너비 제한 컨테이너 */}
         <div className="mx-auto flex min-h-screen w-full max-w-sm flex-col bg-background shadow-xl">
+          {/* 상단 헤더 — 로고 + 인증 버튼 + 테마 스위처 */}
           <header className="sticky top-0 z-10 flex h-14 items-center justify-between border-b bg-background px-4">
             <Link href="/" className="text-base font-bold tracking-tight">
               모임
             </Link>
             <div className="flex items-center gap-2">
+              <ThemeSwitcher />
               <Suspense>
                 <AuthButton />
               </Suspense>
             </div>
           </header>
-          <main className="flex-1 p-4">{children}</main>
-          <footer className="flex items-center justify-center border-t py-4 lg:hidden">
-            <ThemeSwitcher />
-          </footer>
+
+          {/* 메인 콘텐츠 — 하단 탭바 높이(pb-16)만큼 패딩 확보 */}
+          <main className="flex-1 p-4 pb-16">{children}</main>
+
+          {/* 하단 고정 탭바 */}
+          <BottomTabBar />
         </div>
       </div>
     </div>

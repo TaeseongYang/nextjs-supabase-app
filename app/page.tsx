@@ -3,7 +3,13 @@ import { createClient } from "@/lib/supabase/server";
 import { ThemeSwitcher } from "@/components/theme-switcher";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { CalendarDays, Car, Receipt } from "lucide-react";
+import {
+  CalendarDays,
+  Car,
+  Receipt,
+  Share2,
+  LayoutDashboard,
+} from "lucide-react";
 
 export default async function Home() {
   const supabase = await createClient();
@@ -72,6 +78,61 @@ export default async function Home() {
               <p className="text-sm text-muted-foreground">
                 1/n 또는 개별 분담으로 정산하고 입금 여부를 한눈에 확인하세요.
               </p>
+            </div>
+          </div>
+          {/* 사용 흐름 섹션 */}
+          <div className="flex w-full flex-col gap-8">
+            <h2 className="text-center text-2xl font-bold">
+              이렇게 사용하세요
+            </h2>
+            <div className="flex flex-col gap-6">
+              {/* 스텝 1: 이벤트 생성 */}
+              <div className="flex items-start gap-4">
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-bold text-primary-foreground">
+                  1
+                </div>
+                <div className="flex flex-col gap-1">
+                  <div className="flex items-center gap-2 font-semibold">
+                    <CalendarDays className="h-4 w-4" />
+                    이벤트 생성
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    날짜, 장소, 인원을 설정하고 이벤트를 만드세요.
+                  </p>
+                </div>
+              </div>
+
+              {/* 스텝 2: 초대 링크 공유 */}
+              <div className="flex items-start gap-4">
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-bold text-primary-foreground">
+                  2
+                </div>
+                <div className="flex flex-col gap-1">
+                  <div className="flex items-center gap-2 font-semibold">
+                    <Share2 className="h-4 w-4" />
+                    초대 링크 공유
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    카카오톡으로 링크를 보내면 누구나 바로 참여할 수 있습니다.
+                  </p>
+                </div>
+              </div>
+
+              {/* 스텝 3: 통합 관리 */}
+              <div className="flex items-start gap-4">
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-bold text-primary-foreground">
+                  3
+                </div>
+                <div className="flex flex-col gap-1">
+                  <div className="flex items-center gap-2 font-semibold">
+                    <LayoutDashboard className="h-4 w-4" />
+                    통합 관리
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    참여 현황, 카풀, 정산을 한 화면에서 확인하세요.
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
