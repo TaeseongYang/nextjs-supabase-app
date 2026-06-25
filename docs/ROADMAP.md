@@ -82,16 +82,33 @@
   - ✅ 더미 데이터 생성 유틸리티 작성 (`lib/mock/*` — 이벤트/참여자/카풀/정산 샘플 데이터)
 
 - **Task 004: 주최자 영역 페이지 UI 완성** ✅ - 완료
-  - 랜딩 페이지(`/`) — 서비스 소개 + 회원가입/로그인 CTA
-  - 주최자 대시보드(`/dashboard`) — 내 이벤트 목록 카드 + 상태 필터 UI (더미 데이터)
-  - 이벤트 생성/수정 페이지 폼 UI (`/events/new`, `/events/[id]/edit`) — React Hook Form + Zod 스키마 골격
-  - 이벤트 상세 페이지(`/events/[id]`) — 공지/참여자/카풀/정산 4개 탭 레이아웃 + 초대 링크 공유 UI
+  - See: `/tasks/004-page-ui.md`
+  - ✅ 랜딩 페이지(`/`) — 서비스 소개 + 회원가입/로그인 CTA
+  - ✅ 주최자 대시보드(`/dashboard`) — 내 이벤트 목록 카드 + 상태 필터 UI (더미 데이터)
+  - ✅ 이벤트 생성/수정 페이지 폼 UI (`/events/new`, `/events/[id]/edit`) — React Hook Form + Zod 스키마 골격
+  - ✅ 이벤트 상세 페이지(`/events/[id]`) — 공지/참여자/카풀/정산 4개 탭 레이아웃 + 초대 링크 공유 UI
 
 - **Task 005: 참여자(비회원) 영역 페이지 UI 완성** ✅ - 완료
-  - 참여자 진입 페이지(`/join/[token]`) — 공지 표시 + 참여 응답 폼 + 참여자 현황 UI
-  - 카풀 신청 페이지(`/join/[token]/carpooling`) — 드라이버 등록/동승 신청/카풀 현황 테이블 UI
-  - 정산 내역 페이지(`/join/[token]/settlement`) — 비용 항목/분담 내역/입금 상태 요약 UI
-  - 전 페이지 모바일 반응형 검증 및 비회원 진입 플로우(링크 → 참여 → 카풀/정산) 네비게이션 완성
+  - See: `/tasks/005-guest-ui.md`
+  - ✅ 참여자 진입 페이지(`/join/[token]`) — 공지 표시 + 참여 응답 폼 + 참여자 현황 UI
+  - ✅ 카풀 신청 페이지(`/join/[token]/carpooling`) — 드라이버 등록/동승 신청/카풀 현황 테이블 UI
+  - ✅ 정산 내역 페이지(`/join/[token]/settlement`) — 비용 항목/분담 내역/입금 상태 요약 UI
+  - ✅ 전 페이지 모바일 반응형 검증 및 비회원 진입 플로우(링크 → 참여 → 카풀/정산) 네비게이션 완성
+
+- **Task 006-admin: 관리자 데스크톱 페이지 UI 완성** ✅ - 완료
+  - See: `/tasks/006-admin-ui.md`
+  - ✅ recharts 패키지 설치
+  - ✅ 관리자 전용 Mock 데이터 작성 (`lib/mock/admin.mock.ts` — AdminUser, AdminStats, MonthlyStats, EventStatusDist, ActivityFeedItem)
+  - ✅ `app/admin/` 라우트 구조 구현 (route group 아님, /admin/\* URL 유지)
+  - ✅ 관리자 데스크톱 레이아웃 구현 (`app/admin/layout.tsx` — w-60 고정 사이드바 + 메인 영역)
+  - ✅ 관리자 사이드바 네비게이션 구현 (`components/admin-sidebar-nav.tsx` — usePathname 활성 상태)
+  - ✅ 관리자 로그인 페이지 UI 구현 (`/admin/login` — Supabase 인증 연결, 성공 시 /admin/dashboard 이동)
+  - ✅ `/admin` 접근 시 `/admin/login`으로 자동 리디렉션 (`app/admin/page.tsx`)
+  - ✅ 관리자 대시보드 메인 페이지 UI 구현 (`/admin/dashboard` — 핵심 지표 카드 4개 + 최근 활동 피드 + 이벤트 상태 분포)
+  - ✅ 이벤트 관리 테이블 페이지 UI 구현 (`/admin/events` — 제목 검색 + 상태 필터 + shadcn/ui Table)
+  - ✅ 사용자 관리 테이블 페이지 UI 구현 (`/admin/users` — 이름/이메일 검색 + 이벤트 수 Badge)
+  - ✅ 통계 분석 페이지 UI 구현 (`/admin/analytics` — 월별 AreaChart + 상태 분포 PieChart + 참여자 BarChart)
+  - ✅ 미들웨어 publicPaths에 `/admin/login` 추가 (`lib/supabase/proxy.ts`)
 
 > **⛳ UI 검토 게이트 (Phase 2 → Phase 3 진입 전 필수)**
 > Phase 2 완료 후 전체 UI/UX를 실제로 사용해보며 보완점을 확인한다.
