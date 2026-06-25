@@ -1,58 +1,85 @@
-import { DeployButton } from "@/components/deploy-button";
-import { EnvVarWarning } from "@/components/env-var-warning";
-import { AuthButton } from "@/components/auth-button";
-import { Hero } from "@/components/hero";
+import { redirect } from "next/navigation";
+import { createClient } from "@/lib/supabase/server";
 import { ThemeSwitcher } from "@/components/theme-switcher";
-import { ConnectSupabaseSteps } from "@/components/tutorial/connect-supabase-steps";
-import { SignUpUserSteps } from "@/components/tutorial/sign-up-user-steps";
-import { hasEnvVars } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { Suspense } from "react";
+import { CalendarDays, Car, Receipt } from "lucide-react";
 
-export default function Home() {
+export default async function Home() {
+  const supabase = await createClient();
+  const { data: claimsData } = await supabase.auth.getClaims();
+  if (claimsData?.claims) {
+    redirect("/dashboard");
+  }
+
   return (
-    <main className="flex min-h-screen flex-col items-center">
-      <div className="flex w-full flex-1 flex-col items-center gap-20">
-        <nav className="flex h-16 w-full justify-center border-b border-b-foreground/10">
-          <div className="flex w-full max-w-5xl items-center justify-between p-3 px-5 text-sm">
-            <div className="flex items-center gap-5 font-semibold">
-              <Link href={"/"}>Next.js Supabase Starter</Link>
-              <div className="flex items-center gap-2">
-                <DeployButton />
-              </div>
-            </div>
-            {!hasEnvVars ? (
-              <EnvVarWarning />
-            ) : (
-              <Suspense>
-                <AuthButton />
-              </Suspense>
-            )}
-          </div>
-        </nav>
-        <div className="flex max-w-5xl flex-1 flex-col gap-20 p-5">
-          <Hero />
-          <main className="flex flex-1 flex-col gap-6 px-4">
-            <h2 className="mb-4 text-xl font-medium">Next steps</h2>
-            {hasEnvVars ? <SignUpUserSteps /> : <ConnectSupabaseSteps />}
-          </main>
-        </div>
-
-        <footer className="mx-auto flex w-full items-center justify-center gap-8 border-t py-16 text-center text-xs">
-          <p>
-            Powered by{" "}
-            <a
-              href="https://supabase.com/?utm_source=create-next-app&utm_medium=template&utm_term=nextjs"
-              target="_blank"
-              className="font-bold hover:underline"
-              rel="noreferrer"
-            >
-              Supabase
-            </a>
-          </p>
+    <div className="flex min-h-screen flex-col">
+      <nav className="flex h-16 w-full justify-center border-b border-b-foreground/10">
+        <div className="flex w-full max-w-5xl items-center justify-between p-3 px-5 text-sm">
+          <span className="font-semibold">모임</span>
           <ThemeSwitcher />
-        </footer>
-      </div>
-    </main>
+        </div>
+      </nav>
+
+      <main className="flex flex-1 flex-col items-center justify-center">
+        <div className="flex w-full max-w-5xl flex-col items-center gap-16 p-5 py-20">
+          <div className="flex flex-col items-center gap-6 text-center">
+            <h1 className="text-5xl font-bold tracking-tight">모임</h1>
+            <p className="max-w-xl text-xl text-muted-foreground">
+              초대 링크 하나로 모임을 통합 관리하세요
+            </p>
+            <p className="max-w-xl text-muted-foreground">
+              일정 · 참여자 · 카풀 · 정산을 한 곳에서 손쉽게 관리하고,
+              <br />
+              초대 링크만으로 누구나 참여할 수 있습니다.
+            </p>
+            <div className="flex gap-3">
+              <Button asChild size="lg">
+                <Link href="/auth/sign-up">시작하기</Link>
+              </Button>
+              <Button asChild size="lg" variant="outline">
+                <Link href="/auth/login">로그인</Link>
+              </Button>
+            </div>
+          </div>
+
+          <div className="grid w-full grid-cols-1 gap-6 sm:grid-cols-3">
+            <div className="flex flex-col gap-3 rounded-lg border p-6">
+              <div className="flex h-10 w-10 items-center justify-center rounded-md bg-primary/10">
+                <CalendarDays className="h-5 w-5 text-primary" />
+              </div>
+              <h3 className="font-semibold">이벤트 관리</h3>
+              <p className="text-sm text-muted-foreground">
+                일정·장소·인원을 한 곳에서 관리하고 참여자 현황을 실시간으로
+                확인하세요.
+              </p>
+            </div>
+            <div className="flex flex-col gap-3 rounded-lg border p-6">
+              <div className="flex h-10 w-10 items-center justify-center rounded-md bg-primary/10">
+                <Car className="h-5 w-5 text-primary" />
+              </div>
+              <h3 className="font-semibold">카풀 조율</h3>
+              <p className="text-sm text-muted-foreground">
+                드라이버 등록과 동승 신청을 자동으로 매칭하여 카풀을 쉽게
+                조율하세요.
+              </p>
+            </div>
+            <div className="flex flex-col gap-3 rounded-lg border p-6">
+              <div className="flex h-10 w-10 items-center justify-center rounded-md bg-primary/10">
+                <Receipt className="h-5 w-5 text-primary" />
+              </div>
+              <h3 className="font-semibold">정산 트래킹</h3>
+              <p className="text-sm text-muted-foreground">
+                1/n 또는 개별 분담으로 정산하고 입금 여부를 한눈에 확인하세요.
+              </p>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <footer className="flex w-full items-center justify-center border-t py-6 text-xs text-muted-foreground">
+        <p>© 2026 모임. 모든 권리 보유.</p>
+      </footer>
+    </div>
   );
 }
