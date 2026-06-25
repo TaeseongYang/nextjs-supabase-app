@@ -40,3 +40,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# playwright mcp 임시 파일
+.playwright-mcp/
+
+# shrimp task manager 데이터
+shrimp_data/
