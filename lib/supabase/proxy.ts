@@ -54,6 +54,17 @@ export async function updateSession(request: NextRequest) {
       request.nextUrl.pathname.startsWith(path + "/"),
   );
 
+  // /admin/login을 제외한 /admin/* 경로 — 미인증 시 관리자 로그인으로 리디렉트
+  const isAdminProtectedPath =
+    request.nextUrl.pathname.startsWith("/admin/") &&
+    !request.nextUrl.pathname.startsWith("/admin/login");
+
+  if (!user && isAdminProtectedPath) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/admin/login";
+    return NextResponse.redirect(url);
+  }
+
   if (!user && !isPublicPath) {
     // no user, potentially respond by redirecting the user to the login page
     const url = request.nextUrl.clone();

@@ -40,3 +40,21 @@ export async function updateProfileAction(
     return { data: null, error: message };
   }
 }
+
+// 현재 로그인 사용자의 관리자 권한 여부 확인
+export async function checkAdminAction(): Promise<{
+  isAdmin: boolean;
+  error: string | null;
+}> {
+  try {
+    const supabase = await createClient();
+    const { data } = await supabase.auth.getClaims();
+    if (!data?.claims) return { isAdmin: false, error: null };
+    const service = await createProfileServiceAsync();
+    const profile = await service.getProfile(data.claims.sub);
+    return { isAdmin: profile?.is_admin ?? false, error: null };
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Unknown error";
+    return { isAdmin: false, error: message };
+  }
+}

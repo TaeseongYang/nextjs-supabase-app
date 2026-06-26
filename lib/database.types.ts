@@ -14,6 +14,190 @@ export type Database = {
   }
   public: {
     Tables: {
+      announcements: {
+        Row: {
+          content: string
+          created_at: string | null
+          event_id: string
+          id: string
+          is_pinned: boolean
+        }
+        Insert: {
+          content: string
+          created_at?: string | null
+          event_id: string
+          id?: string
+          is_pinned?: boolean
+        }
+        Update: {
+          content?: string
+          created_at?: string | null
+          event_id?: string
+          id?: string
+          is_pinned?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "announcements_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      carpool_requests: {
+        Row: {
+          carpool_id: string
+          id: string
+          participant_id: string
+          status: Database["public"]["Enums"]["carpool_request_status"]
+        }
+        Insert: {
+          carpool_id: string
+          id?: string
+          participant_id: string
+          status?: Database["public"]["Enums"]["carpool_request_status"]
+        }
+        Update: {
+          carpool_id?: string
+          id?: string
+          participant_id?: string
+          status?: Database["public"]["Enums"]["carpool_request_status"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "carpool_requests_carpool_id_fkey"
+            columns: ["carpool_id"]
+            isOneToOne: false
+            referencedRelation: "carpools"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "carpool_requests_participant_id_fkey"
+            columns: ["participant_id"]
+            isOneToOne: false
+            referencedRelation: "participants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      carpools: {
+        Row: {
+          departure_location: string
+          departure_time: string
+          driver_participant_id: string
+          event_id: string
+          id: string
+          max_passengers: number
+        }
+        Insert: {
+          departure_location: string
+          departure_time: string
+          driver_participant_id: string
+          event_id: string
+          id?: string
+          max_passengers: number
+        }
+        Update: {
+          departure_location?: string
+          departure_time?: string
+          driver_participant_id?: string
+          event_id?: string
+          id?: string
+          max_passengers?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "carpools_driver_participant_id_fkey"
+            columns: ["driver_participant_id"]
+            isOneToOne: false
+            referencedRelation: "participants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "carpools_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      events: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          event_date: string
+          id: string
+          invite_token: string
+          location: string
+          max_participants: number | null
+          organizer_id: string
+          status: Database["public"]["Enums"]["event_status"]
+          title: string
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          event_date: string
+          id?: string
+          invite_token: string
+          location: string
+          max_participants?: number | null
+          organizer_id: string
+          status?: Database["public"]["Enums"]["event_status"]
+          title: string
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          event_date?: string
+          id?: string
+          invite_token?: string
+          location?: string
+          max_participants?: number | null
+          organizer_id?: string
+          status?: Database["public"]["Enums"]["event_status"]
+          title?: string
+        }
+        Relationships: []
+      }
+      participants: {
+        Row: {
+          event_id: string
+          id: string
+          joined_at: string | null
+          name: string
+          phone: string | null
+          status: Database["public"]["Enums"]["participant_status"]
+        }
+        Insert: {
+          event_id: string
+          id?: string
+          joined_at?: string | null
+          name: string
+          phone?: string | null
+          status?: Database["public"]["Enums"]["participant_status"]
+        }
+        Update: {
+          event_id?: string
+          id?: string
+          joined_at?: string | null
+          name?: string
+          phone?: string | null
+          status?: Database["public"]["Enums"]["participant_status"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "participants_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -22,6 +206,7 @@ export type Database = {
           email: string
           full_name: string | null
           id: string
+          is_admin: boolean
           updated_at: string | null
           username: string | null
           website: string | null
@@ -33,6 +218,7 @@ export type Database = {
           email: string
           full_name?: string | null
           id: string
+          is_admin?: boolean
           updated_at?: string | null
           username?: string | null
           website?: string | null
@@ -44,11 +230,86 @@ export type Database = {
           email?: string
           full_name?: string | null
           id?: string
+          is_admin?: boolean
           updated_at?: string | null
           username?: string | null
           website?: string | null
         }
         Relationships: []
+      }
+      settlement_details: {
+        Row: {
+          amount: number
+          id: string
+          is_paid: boolean
+          paid_at: string | null
+          participant_id: string
+          settlement_item_id: string
+        }
+        Insert: {
+          amount: number
+          id?: string
+          is_paid?: boolean
+          paid_at?: string | null
+          participant_id: string
+          settlement_item_id: string
+        }
+        Update: {
+          amount?: number
+          id?: string
+          is_paid?: boolean
+          paid_at?: string | null
+          participant_id?: string
+          settlement_item_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "settlement_details_participant_id_fkey"
+            columns: ["participant_id"]
+            isOneToOne: false
+            referencedRelation: "participants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "settlement_details_settlement_item_id_fkey"
+            columns: ["settlement_item_id"]
+            isOneToOne: false
+            referencedRelation: "settlement_items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      settlement_items: {
+        Row: {
+          event_id: string
+          id: string
+          split_type: Database["public"]["Enums"]["split_type"]
+          title: string
+          total_amount: number
+        }
+        Insert: {
+          event_id: string
+          id?: string
+          split_type: Database["public"]["Enums"]["split_type"]
+          title: string
+          total_amount: number
+        }
+        Update: {
+          event_id?: string
+          id?: string
+          split_type?: Database["public"]["Enums"]["split_type"]
+          title?: string
+          total_amount?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "settlement_items_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
@@ -58,7 +319,10 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      carpool_request_status: "pending" | "confirmed" | "rejected"
+      event_status: "recruiting" | "confirmed" | "completed" | "cancelled"
+      participant_status: "attending" | "absent" | "pending" | "waitlisted"
+      split_type: "equal" | "custom"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -185,6 +449,11 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      carpool_request_status: ["pending", "confirmed", "rejected"],
+      event_status: ["recruiting", "confirmed", "completed", "cancelled"],
+      participant_status: ["attending", "absent", "pending", "waitlisted"],
+      split_type: ["equal", "custom"],
+    },
   },
 } as const

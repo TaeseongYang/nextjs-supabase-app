@@ -8,6 +8,7 @@ import {
   MOCK_ADMIN_STATS,
   MOCK_EVENT_STATUS_DIST,
 } from "@/lib/mock/admin.mock";
+import { checkAdminAction } from "@/lib/profiles/profile.actions";
 import { createClient } from "@/lib/supabase/server";
 import { CalendarDays, Percent, TrendingUp, Users } from "lucide-react";
 import { redirect } from "next/navigation";
@@ -20,6 +21,10 @@ export default async function AdminDashboardPage() {
   if (!data?.claims) {
     redirect("/admin/login");
   }
+
+  // 관리자 권한 검증 — is_admin=false인 인증 사용자 차단
+  const { isAdmin } = await checkAdminAction();
+  if (!isAdmin) redirect("/admin/login");
 
   return (
     <div>

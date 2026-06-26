@@ -14,11 +14,11 @@
   },
   "lint-staged": {
     "!(*.config).{ts,tsx}": [
-      "eslint --fix --max-warnings 0",
+      "eslint --fix --max-warnings 0 --no-warn-ignored",
       "prettier --write"
     ],
     "!(*.config).{js,mjs,cjs,jsx}": [
-      "eslint --fix --max-warnings 0",
+      "eslint --fix --max-warnings 0 --no-warn-ignored",
       "prettier --write"
     ],
     "*.config.{ts,tsx,js,mjs,cjs}": [

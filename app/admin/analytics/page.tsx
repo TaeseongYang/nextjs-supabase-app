@@ -4,6 +4,7 @@ import { ParticipationBarChart } from "@/components/admin-charts/participation-b
 import { StatusPieChart } from "@/components/admin-charts/status-pie-chart";
 import { PageHeader } from "@/components/page-header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { checkAdminAction } from "@/lib/profiles/profile.actions";
 import {
   MOCK_ADMIN_STATS,
   MOCK_EVENT_STATUS_DIST,
@@ -21,6 +22,10 @@ export default async function AdminAnalyticsPage() {
   if (!data?.claims) {
     redirect("/admin/login");
   }
+
+  // 관리자 권한 검증 — is_admin=false인 인증 사용자 차단
+  const { isAdmin } = await checkAdminAction();
+  if (!isAdmin) redirect("/admin/login");
 
   // 총 참여자 수 합산
   const totalParticipants = MOCK_MONTHLY_STATS.reduce(

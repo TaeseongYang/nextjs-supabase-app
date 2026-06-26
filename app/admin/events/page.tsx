@@ -1,5 +1,6 @@
 import { AdminEventsTable } from "@/components/admin-events-table";
 import { PageHeader } from "@/components/page-header";
+import { checkAdminAction } from "@/lib/profiles/profile.actions";
 import { MOCK_EVENTS_WITH_STATS } from "@/lib/mock/events.mock";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
@@ -12,6 +13,10 @@ export default async function AdminEventsPage() {
   if (!data?.claims) {
     redirect("/admin/login");
   }
+
+  // 관리자 권한 검증 — is_admin=false인 인증 사용자 차단
+  const { isAdmin } = await checkAdminAction();
+  if (!isAdmin) redirect("/admin/login");
 
   return (
     <div>
