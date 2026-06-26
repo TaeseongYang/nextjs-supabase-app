@@ -176,6 +176,14 @@
 
 ### Phase 4: 고급 기능 및 최적화
 
+- **Task 010-2: Tailwind CSS v4 업그레이드** ✅ - 완료
+  - ✅ tailwindcss v3.4.1 → v4.3.1 업그레이드 및 `@tailwindcss/postcss` 4.3.1 설치
+  - ✅ `tw-animate-css` 1.4.0 도입으로 `tailwindcss-animate` 대체, autoprefixer 제거 (v4 내장)
+  - ✅ `postcss.config.mjs`를 `@tailwindcss/postcss` 플러그인 방식으로 전환
+  - ✅ `app/globals.css` CSS-first 방식 전환 (`@import "tailwindcss"`, `@theme inline`, `@custom-variant dark`)
+  - ✅ `tailwind.config.ts` 삭제 (v4에서 불필요) 및 `.prettierrc` `tailwindConfig` → `tailwindStylesheet` 변경
+  - ✅ 빌드 · 타입체크 · 린트 전체 통과 검증
+
 - **Task 011: 사용자 경험 향상 및 부가 기능**
   - 카카오톡 공유 미리보기 최적화 및 동적 OG 이미지 생성
   - 참여/카풀/정산 변경에 대한 실시간 반영(Supabase Realtime) 적용 검토
