@@ -28,6 +28,16 @@ export function SignUpForm({
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
+  const translateSignUpError = (message: string): string => {
+    if (message.includes("User already registered"))
+      return "이미 가입된 이메일 주소입니다.";
+    if (message.includes("Password should be at least"))
+      return "비밀번호는 6자 이상이어야 합니다.";
+    if (message.includes("Unable to validate email address"))
+      return "올바른 이메일 형식이 아닙니다.";
+    return "회원가입 중 오류가 발생했습니다. 다시 시도해주세요.";
+  };
+
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     const supabase = createClient();
@@ -41,17 +51,28 @@ export function SignUpForm({
     }
 
     try {
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
           emailRedirectTo: `${window.location.origin}/auth/callback`,
         },
       });
-      if (error) throw error;
+      if (error) {
+        setError(translateSignUpError(error.message));
+        return;
+      }
+      if (data.user?.identities?.length === 0) {
+        setError("이미 가입된 이메일 주소입니다.");
+        return;
+      }
       router.push("/auth/sign-up-success");
     } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : "An error occurred");
+      setError(
+        error instanceof Error
+          ? translateSignUpError(error.message)
+          : "회원가입 중 오류가 발생했습니다. 다시 시도해주세요.",
+      );
     } finally {
       setIsLoading(false);
     }

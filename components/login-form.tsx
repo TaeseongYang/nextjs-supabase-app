@@ -27,6 +27,16 @@ export function LoginForm({
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
+  const translateLoginError = (message: string): string => {
+    if (message.includes("Invalid login credentials"))
+      return "이메일 또는 비밀번호가 올바르지 않습니다.";
+    if (message.includes("Email not confirmed"))
+      return "이메일 인증이 완료되지 않았습니다. 이메일을 확인해주세요.";
+    if (message.includes("Too many requests"))
+      return "잠시 후 다시 시도해주세요.";
+    return "로그인 중 오류가 발생했습니다. 다시 시도해주세요.";
+  };
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     const supabase = createClient();
@@ -39,10 +49,13 @@ export function LoginForm({
         password,
       });
       if (error) throw error;
-      // Update this route to redirect to an authenticated route. The user already has an active session.
       router.push("/dashboard");
     } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : "An error occurred");
+      setError(
+        error instanceof Error
+          ? translateLoginError(error.message)
+          : "로그인 중 오류가 발생했습니다. 다시 시도해주세요.",
+      );
     } finally {
       setIsLoading(false);
     }

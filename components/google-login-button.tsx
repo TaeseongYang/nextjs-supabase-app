@@ -16,7 +16,7 @@ export function GoogleLoginButton() {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
+        redirectTo: `${window.location.origin}/auth/callback?next=/dashboard`,
         queryParams: {
           access_type: "offline",
           prompt: "consent",
@@ -41,7 +41,7 @@ export function GoogleLoginButton() {
         disabled={isLoading}
       >
         {isLoading ? (
-          "Redirecting..."
+          "리다이렉트 중..."
         ) : (
           <span className="flex items-center gap-2">
             <svg
