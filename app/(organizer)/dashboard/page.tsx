@@ -1,4 +1,3 @@
-import { redirect } from "next/navigation";
 import Link from "next/link";
 import { PlusCircle, Link2 } from "lucide-react";
 
@@ -8,12 +7,6 @@ import { MOCK_EVENTS_WITH_STATS } from "@/lib/mock/events.mock";
 
 export default async function DashboardPage() {
   const supabase = await createClient();
-  const { data: claimsData, error: authError } =
-    await supabase.auth.getClaims();
-  if (authError || !claimsData?.claims) {
-    redirect("/auth/login");
-  }
-
   const {
     data: { user },
   } = await supabase.auth.getUser();

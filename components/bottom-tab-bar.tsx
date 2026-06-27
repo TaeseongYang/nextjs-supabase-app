@@ -19,16 +19,16 @@ const TAB_ITEMS: TabItem[] = [
   { label: "홈", href: "/dashboard", icon: Home },
   { label: "이벤트", href: "/events", icon: CalendarDays },
   { label: "새 이벤트", href: "/events/new", icon: PlusCircle },
-  { label: "프로필", href: "/protected", icon: User },
+  { label: "프로필", href: "/profile", icon: User },
 ];
 
 export function BottomTabBar() {
   const pathname = usePathname();
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 flex justify-center">
+    <div className="fixed right-0 bottom-0 left-0 z-50 flex justify-center">
       <nav className="w-full max-w-sm border-t bg-background">
-        <div className="flex items-center justify-around px-2 pb-2 pt-1">
+        <div className="flex items-center justify-around px-2 pt-1 pb-2">
           {TAB_ITEMS.map(({ label, href, icon: Icon }) => {
             // 현재 경로와 탭 href가 일치하면 활성 상태로 처리
             const isActive =

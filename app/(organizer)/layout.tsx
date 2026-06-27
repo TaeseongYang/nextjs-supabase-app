@@ -1,14 +1,19 @@
 import { AuthButton } from "@/components/auth-button";
 import { BottomTabBar } from "@/components/bottom-tab-bar";
 import { ThemeSwitcher } from "@/components/theme-switcher";
+import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { Suspense } from "react";
 
-export default function OrganizerLayout({
+export default async function OrganizerLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const supabase = await createClient();
+  const { data } = await supabase.auth.getClaims();
+  if (!data?.claims) redirect("/auth/login");
   return (
     <div className="flex min-h-screen bg-muted/30">
       <div className="flex-1">

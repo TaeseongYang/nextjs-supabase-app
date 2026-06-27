@@ -54,6 +54,14 @@ export async function updateSession(request: NextRequest) {
       request.nextUrl.pathname.startsWith(path + "/"),
   );
 
+  // 주최자 보호 경로 — 미인증 시 /auth/login으로 리디렉트
+  const organizerProtectedPaths = ["/dashboard", "/events", "/profile"];
+  const isOrganizerProtectedPath = organizerProtectedPaths.some(
+    (path) =>
+      request.nextUrl.pathname === path ||
+      request.nextUrl.pathname.startsWith(path + "/"),
+  );
+
   // /admin/login을 제외한 /admin/* 경로 — 미인증 시 관리자 로그인으로 리디렉트
   const isAdminProtectedPath =
     request.nextUrl.pathname.startsWith("/admin/") &&
@@ -65,8 +73,8 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  if (!user && !isPublicPath) {
-    // no user, potentially respond by redirecting the user to the login page
+  if (!user && (isOrganizerProtectedPath || !isPublicPath)) {
+    // 미인증 사용자를 로그인 페이지로 리디렉트
     const url = request.nextUrl.clone();
     url.pathname = "/auth/login";
     return NextResponse.redirect(url);
