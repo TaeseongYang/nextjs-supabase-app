@@ -4,10 +4,9 @@ import { EventStatusBadge } from "@/components/event-status-badge";
 import { PageHeader } from "@/components/page-header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
-  MOCK_ACTIVITY_FEED,
-  MOCK_ADMIN_STATS,
-  MOCK_EVENT_STATUS_DIST,
-} from "@/lib/mock/admin.mock";
+  getAdminAnalyticsAction,
+  getAdminDashboardStatsAction,
+} from "@/lib/admin/admin.actions";
 import { checkAdminAction } from "@/lib/profiles/profile.actions";
 import { createClient } from "@/lib/supabase/server";
 import { CalendarDays, Percent, TrendingUp, Users } from "lucide-react";
@@ -26,6 +25,21 @@ export default async function AdminDashboardPage() {
   const { isAdmin } = await checkAdminAction();
   if (!isAdmin) redirect("/admin/login");
 
+  // 대시보드 통계 및 활동 피드 조회
+  const statsResult = await getAdminDashboardStatsAction();
+  // 이벤트 상태 분포는 analytics action에서 가져옴
+  const analyticsResult = await getAdminAnalyticsAction();
+
+  // 에러 시 기본값으로 graceful 처리
+  const stats = statsResult.data?.stats ?? {
+    total_events: 0,
+    total_users: 0,
+    new_events_this_month: 0,
+    avg_participation_rate: 0,
+  };
+  const feed = statsResult.data?.feed ?? [];
+  const statusDist = analyticsResult.data?.statusDist ?? [];
+
   return (
     <div>
       <PageHeader title="대시보드" description="서비스 현황 요약" />
@@ -34,25 +48,25 @@ export default async function AdminDashboardPage() {
       <div className="grid grid-cols-4 gap-4">
         <AdminStatsCard
           title="총 이벤트"
-          value={MOCK_ADMIN_STATS.total_events}
+          value={stats.total_events}
           description="전체 등록된 이벤트 수"
           icon={CalendarDays}
         />
         <AdminStatsCard
           title="총 사용자"
-          value={MOCK_ADMIN_STATS.total_users}
+          value={stats.total_users}
           description="가입된 전체 사용자 수"
           icon={Users}
         />
         <AdminStatsCard
           title="이번달 신규 이벤트"
-          value={MOCK_ADMIN_STATS.new_events_this_month}
+          value={stats.new_events_this_month}
           description="이번달 새로 생성된 이벤트"
           icon={TrendingUp}
         />
         <AdminStatsCard
           title="평균 참여율"
-          value={`${MOCK_ADMIN_STATS.avg_participation_rate}%`}
+          value={`${stats.avg_participation_rate}%`}
           description="이벤트 평균 참여율"
           icon={Percent}
         />
@@ -66,7 +80,7 @@ export default async function AdminDashboardPage() {
             <CardTitle className="text-base">최근 활동</CardTitle>
           </CardHeader>
           <CardContent>
-            <AdminActivityFeed items={MOCK_ACTIVITY_FEED} />
+            <AdminActivityFeed items={feed} />
           </CardContent>
         </Card>
 
@@ -77,7 +91,7 @@ export default async function AdminDashboardPage() {
           </CardHeader>
           <CardContent>
             <ul className="space-y-3">
-              {MOCK_EVENT_STATUS_DIST.map((item) => (
+              {statusDist.map((item) => (
                 <li
                   key={item.status}
                   className="flex items-center justify-between"

@@ -1,12 +1,22 @@
 import { AdminUsersTable } from "@/components/admin-users-table";
+import { AdminPagination } from "@/components/admin-pagination";
 import { PageHeader } from "@/components/page-header";
+import { getAdminUsersAction } from "@/lib/admin/admin.actions";
 import { checkAdminAction } from "@/lib/profiles/profile.actions";
-import { MOCK_ADMIN_USERS } from "@/lib/mock/admin.mock";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 
-// 관리자 사용자 관리 페이지
-export default async function AdminUsersPage() {
+interface AdminUsersPageProps {
+  searchParams: Promise<{
+    page?: string;
+    search?: string;
+  }>;
+}
+
+// 관리자 사용자 관리 페이지 (서버 사이드 페이지네이션 및 검색)
+export default async function AdminUsersPage({
+  searchParams,
+}: AdminUsersPageProps) {
   // 인증 확인 — 미인증 시 관리자 로그인 페이지로 리디렉션
   const supabase = await createClient();
   const { data } = await supabase.auth.getClaims();
@@ -18,13 +28,51 @@ export default async function AdminUsersPage() {
   const { isAdmin } = await checkAdminAction();
   if (!isAdmin) redirect("/admin/login");
 
+  // searchParams 비동기 처리 (Next.js 15 필수)
+  const params = await searchParams;
+  const page = Math.max(1, Number(params.page ?? "1"));
+  const pageSize = 10;
+  const search = params.search ?? undefined;
+
+  // 서버 사이드에서 사용자 목록 조회
+  const { data: result, error } = await getAdminUsersAction({
+    page,
+    pageSize,
+    search,
+  });
+
+  if (error || !result) {
+    return (
+      <div>
+        <PageHeader
+          title="사용자 관리"
+          description="데이터를 불러오지 못했습니다"
+        />
+        <p className="text-destructive">
+          {error ?? "알 수 없는 오류가 발생했습니다"}
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div>
       <PageHeader
         title="사용자 관리"
-        description={`총 ${MOCK_ADMIN_USERS.length}명의 사용자`}
+        description={`총 ${result.total}명의 사용자`}
       />
-      <AdminUsersTable users={MOCK_ADMIN_USERS} />
+      <AdminUsersTable
+        users={result.data}
+        total={result.total}
+        page={result.page}
+        pageSize={result.pageSize}
+      />
+      <AdminPagination
+        page={result.page}
+        pageSize={result.pageSize}
+        total={result.total}
+        basePath="/admin/users"
+      />
     </div>
   );
 }

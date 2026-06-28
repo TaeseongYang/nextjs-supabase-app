@@ -6,10 +6,9 @@ import { PageHeader } from "@/components/page-header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { checkAdminAction } from "@/lib/profiles/profile.actions";
 import {
-  MOCK_ADMIN_STATS,
-  MOCK_EVENT_STATUS_DIST,
-  MOCK_MONTHLY_STATS,
-} from "@/lib/mock/admin.mock";
+  getAdminAnalyticsAction,
+  getAdminDashboardStatsAction,
+} from "@/lib/admin/admin.actions";
 import { createClient } from "@/lib/supabase/server";
 import { BarChart3, Percent, Users } from "lucide-react";
 import { redirect } from "next/navigation";
@@ -27,11 +26,23 @@ export default async function AdminAnalyticsPage() {
   const { isAdmin } = await checkAdminAction();
   if (!isAdmin) redirect("/admin/login");
 
-  // 총 참여자 수 합산
-  const totalParticipants = MOCK_MONTHLY_STATS.reduce(
-    (sum, item) => sum + item.participant_count,
-    0,
-  );
+  // 통계 분석 데이터 조회
+  const analyticsResult = await getAdminAnalyticsAction();
+  // 총 이벤트 수, 평균 참여율은 대시보드 stats에서 가져옴
+  const statsResult = await getAdminDashboardStatsAction();
+
+  // 에러 시 기본값으로 graceful 처리
+  const analytics = analyticsResult.data ?? {
+    monthly: [],
+    statusDist: [],
+    totalParticipants: 0,
+  };
+  const stats = statsResult.data?.stats ?? {
+    total_events: 0,
+    total_users: 0,
+    new_events_this_month: 0,
+    avg_participation_rate: 0,
+  };
 
   return (
     <div>
@@ -44,19 +55,19 @@ export default async function AdminAnalyticsPage() {
       <div className="grid grid-cols-3 gap-4">
         <AdminStatsCard
           title="총 이벤트"
-          value={MOCK_ADMIN_STATS.total_events}
+          value={stats.total_events}
           description="전체 등록된 이벤트 수"
           icon={BarChart3}
         />
         <AdminStatsCard
           title="총 참여자"
-          value={totalParticipants}
+          value={analytics.totalParticipants}
           description="전체 이벤트 누적 참여자 수"
           icon={Users}
         />
         <AdminStatsCard
           title="평균 참여율"
-          value={`${MOCK_ADMIN_STATS.avg_participation_rate}%`}
+          value={`${stats.avg_participation_rate}%`}
           description="이벤트 평균 참여율"
           icon={Percent}
         />
@@ -71,7 +82,7 @@ export default async function AdminAnalyticsPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <MonthlyAreaChart data={MOCK_MONTHLY_STATS} />
+            <MonthlyAreaChart data={analytics.monthly} />
           </CardContent>
         </Card>
       </div>
@@ -84,7 +95,7 @@ export default async function AdminAnalyticsPage() {
             <CardTitle className="text-base">이벤트 상태 분포</CardTitle>
           </CardHeader>
           <CardContent>
-            <StatusPieChart data={MOCK_EVENT_STATUS_DIST} />
+            <StatusPieChart data={analytics.statusDist} />
           </CardContent>
         </Card>
 
@@ -94,7 +105,7 @@ export default async function AdminAnalyticsPage() {
             <CardTitle className="text-base">월별 참여자 수</CardTitle>
           </CardHeader>
           <CardContent>
-            <ParticipationBarChart data={MOCK_MONTHLY_STATS} />
+            <ParticipationBarChart data={analytics.monthly} />
           </CardContent>
         </Card>
       </div>
