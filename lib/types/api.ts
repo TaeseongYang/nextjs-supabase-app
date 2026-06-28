@@ -27,8 +27,6 @@ export interface UpdateEventDto extends Partial<CreateEventDto> {
 }
 
 export interface CreateParticipantDto {
-  name: string;
-  phone?: string;
   status: ParticipantStatus;
 }
 

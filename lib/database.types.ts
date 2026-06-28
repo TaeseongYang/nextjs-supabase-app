@@ -174,6 +174,7 @@ export type Database = {
           name: string
           phone: string | null
           status: Database["public"]["Enums"]["participant_status"]
+          user_id: string | null
         }
         Insert: {
           event_id: string
@@ -182,6 +183,7 @@ export type Database = {
           name: string
           phone?: string | null
           status?: Database["public"]["Enums"]["participant_status"]
+          user_id?: string | null
         }
         Update: {
           event_id?: string
@@ -190,6 +192,7 @@ export type Database = {
           name?: string
           phone?: string | null
           status?: Database["public"]["Enums"]["participant_status"]
+          user_id?: string | null
         }
         Relationships: [
           {

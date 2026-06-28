@@ -4,6 +4,7 @@ export const MOCK_PARTICIPANTS: Participant[] = [
   {
     id: "part-001",
     event_id: "evt-001",
+    user_id: "user-001",
     name: "김민준",
     phone: "010-1234-5678",
     status: "attending",
@@ -12,6 +13,7 @@ export const MOCK_PARTICIPANTS: Participant[] = [
   {
     id: "part-002",
     event_id: "evt-001",
+    user_id: "user-002",
     name: "이서연",
     phone: "010-2345-6789",
     status: "attending",
@@ -20,6 +22,7 @@ export const MOCK_PARTICIPANTS: Participant[] = [
   {
     id: "part-003",
     event_id: "evt-001",
+    user_id: "user-003",
     name: "박지훈",
     phone: "010-3456-7890",
     status: "absent",
@@ -28,6 +31,7 @@ export const MOCK_PARTICIPANTS: Participant[] = [
   {
     id: "part-004",
     event_id: "evt-001",
+    user_id: "user-004",
     name: "최수아",
     phone: null,
     status: "pending",
@@ -36,6 +40,7 @@ export const MOCK_PARTICIPANTS: Participant[] = [
   {
     id: "part-005",
     event_id: "evt-001",
+    user_id: "user-005",
     name: "정태양",
     phone: "010-5678-9012",
     status: "attending",
@@ -44,6 +49,7 @@ export const MOCK_PARTICIPANTS: Participant[] = [
   {
     id: "part-006",
     event_id: "evt-001",
+    user_id: "user-006",
     name: "한가을",
     phone: "010-6789-0123",
     status: "waitlisted",
