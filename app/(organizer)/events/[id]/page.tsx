@@ -1,18 +1,16 @@
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import Link from "next/link";
 import { CalendarDays, MapPin, Pencil } from "lucide-react";
-import { createClient } from "@/lib/supabase/server";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { PageHeader } from "@/components/page-header";
 import { EventStatusBadge } from "@/components/event-status-badge";
 import { InviteLinkButton } from "@/components/invite-link-button";
 import { EventDetailTabs } from "@/components/event-detail-tabs";
-import { MOCK_EVENTS, MOCK_JOIN_PAGE_DATA } from "@/lib/mock/events.mock";
-import { MOCK_PARTICIPANTS } from "@/lib/mock/participants.mock";
-import { MOCK_CARPOOLS_WITH_DETAILS } from "@/lib/mock/carpools.mock";
-import { MOCK_SETTLEMENT_SUMMARIES } from "@/lib/mock/settlement.mock";
+import { EventStatusChanger } from "@/components/event-status-changer";
+import { getEventAction } from "@/lib/events/event.actions";
 import { formatEventDate } from "@/lib/utils";
+import type { EventStatus } from "@/lib/types/enums";
 
 interface EventDetailPageProps {
   params: Promise<{ id: string }>;
@@ -21,24 +19,14 @@ interface EventDetailPageProps {
 export default async function EventDetailPage({
   params,
 }: EventDetailPageProps) {
+  // Next.js 15 비동기 params 패턴
   const { id } = await params;
 
-  // 인증 확인 — 미인증 시 로그인 페이지로 리디렉션
-  const supabase = await createClient();
-  const { data: claimsData, error: authError } =
-    await supabase.auth.getClaims();
-  if (authError || !claimsData?.claims) {
-    redirect("/auth/login");
-  }
+  // Server Action으로 실데이터 조회 (소유권 검증 포함)
+  const { data: event, error } = await getEventAction(id);
 
-  // id로 이벤트 찾기 (Phase 3에서 실제 DB 연동 예정)
-  const event = MOCK_EVENTS.find((e) => e.id === id);
-  if (!event) notFound();
-
-  // 해당 이벤트의 공지사항만 필터링
-  const announcements = MOCK_JOIN_PAGE_DATA.announcements.filter(
-    (a) => a.event_id === id,
-  );
+  // 이벤트 없음 or 권한 없음 → 404
+  if (error || !event) notFound();
 
   return (
     <div className="flex flex-col gap-6">
@@ -46,12 +34,14 @@ export default async function EventDetailPage({
       <PageHeader
         title={event.title}
         action={
-          <Button asChild variant="outline" size="sm">
-            <Link href={`/events/${id}/edit`}>
-              <Pencil className="mr-1 h-4 w-4" />
-              수정
-            </Link>
-          </Button>
+          event.status !== "cancelled" ? (
+            <Button asChild variant="outline" size="sm">
+              <Link href={`/events/${id}/edit`}>
+                <Pencil className="mr-1 h-4 w-4" />
+                수정
+              </Link>
+            </Button>
+          ) : undefined
         }
       />
 
@@ -79,14 +69,20 @@ export default async function EventDetailPage({
       {/* 초대 링크 복사 버튼 */}
       <InviteLinkButton token={event.invite_token} />
 
+      {/* 상태 전환 버튼 — completed/cancelled이면 null 반환 */}
+      <EventStatusChanger
+        eventId={event.id}
+        currentStatus={event.status as EventStatus}
+      />
+
       <Separator />
 
-      {/* 탭 (공지 / 참여자 / 카풀 / 정산) */}
+      {/* 탭 (공지 / 참여자 / 카풀 / 정산) — 참여자/카풀/정산은 Task 009에서 연동 예정 */}
       <EventDetailTabs
-        announcements={announcements}
-        participants={MOCK_PARTICIPANTS}
-        carpools={MOCK_CARPOOLS_WITH_DETAILS}
-        settlements={MOCK_SETTLEMENT_SUMMARIES}
+        announcements={[]}
+        participants={[]}
+        carpools={[]}
+        settlements={[]}
       />
     </div>
   );
