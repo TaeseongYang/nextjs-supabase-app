@@ -126,6 +126,7 @@ export type Database = {
       }
       events: {
         Row: {
+          cover_image_url: string | null
           created_at: string | null
           description: string | null
           event_date: string
@@ -138,6 +139,7 @@ export type Database = {
           title: string
         }
         Insert: {
+          cover_image_url?: string | null
           created_at?: string | null
           description?: string | null
           event_date: string
@@ -150,6 +152,7 @@ export type Database = {
           title: string
         }
         Update: {
+          cover_image_url?: string | null
           created_at?: string | null
           description?: string | null
           event_date?: string

@@ -23,6 +23,7 @@ export interface Event {
   status: EventStatus;
   invite_token: string;
   created_at: string;
+  cover_image_url: string | null;
 }
 
 export interface Participant {

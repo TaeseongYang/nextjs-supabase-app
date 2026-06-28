@@ -19,6 +19,7 @@ export interface CreateEventDto {
   location: string;
   event_date: string;
   max_participants?: number;
+  cover_image_url?: string;
 }
 
 export interface UpdateEventDto extends Partial<CreateEventDto> {

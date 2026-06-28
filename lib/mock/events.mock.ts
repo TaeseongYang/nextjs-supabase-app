@@ -13,6 +13,7 @@ export const MOCK_EVENTS: Event[] = [
     status: "confirmed",
     invite_token: "token-evt-001",
     created_at: "2024-11-01T09:00:00Z",
+    cover_image_url: null,
   },
   {
     id: "evt-002",
@@ -25,6 +26,7 @@ export const MOCK_EVENTS: Event[] = [
     status: "recruiting",
     invite_token: "token-evt-002",
     created_at: "2024-12-01T10:00:00Z",
+    cover_image_url: null,
   },
   {
     id: "evt-003",
@@ -37,6 +39,7 @@ export const MOCK_EVENTS: Event[] = [
     status: "completed",
     invite_token: "token-evt-003",
     created_at: "2024-06-01T08:00:00Z",
+    cover_image_url: null,
   },
   {
     id: "evt-004",
@@ -49,6 +52,7 @@ export const MOCK_EVENTS: Event[] = [
     status: "cancelled",
     invite_token: "token-evt-004",
     created_at: "2024-10-01T09:00:00Z",
+    cover_image_url: null,
   },
 ];
 
