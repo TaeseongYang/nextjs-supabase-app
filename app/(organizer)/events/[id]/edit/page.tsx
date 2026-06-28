@@ -1,26 +1,21 @@
-import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { notFound } from "next/navigation";
 import { PageHeader } from "@/components/page-header";
 import { EventForm } from "@/components/event-form";
-import { MOCK_EVENTS } from "@/lib/mock/events.mock";
+import { getEventAction } from "@/lib/events/event.actions";
 
 interface EventEditPageProps {
   params: Promise<{ id: string }>;
 }
 
 export default async function EventEditPage({ params }: EventEditPageProps) {
-  // params는 Next.js 15에서 Promise이므로 await 필수
-  const { id: _id } = await params;
+  // Next.js 15 비동기 params 패턴
+  const { id } = await params;
 
-  const supabase = await createClient();
-  const { data: claimsData, error: authError } =
-    await supabase.auth.getClaims();
-  if (authError || !claimsData?.claims) {
-    redirect("/auth/login");
-  }
+  // Server Action으로 실데이터 조회 (소유권 검증 포함)
+  const { data: event, error } = await getEventAction(id);
 
-  // mock 데이터의 첫 번째 이벤트를 수정 대상으로 사용
-  const event = MOCK_EVENTS[0];
+  // 이벤트 없음 or 권한 없음 → 404
+  if (error || !event) notFound();
 
   // EventForm에 전달할 defaultValues 구성
   // max_participants: HTML input[type=number]는 string으로 관리하므로 문자열 변환
@@ -39,7 +34,12 @@ export default async function EventEditPage({ params }: EventEditPageProps) {
   return (
     <div className="flex flex-col gap-8">
       <PageHeader title="이벤트 수정" />
-      <EventForm mode="edit" defaultValues={defaultValues} />
+      <EventForm
+        mode="edit"
+        defaultValues={defaultValues}
+        eventId={id}
+        defaultCoverImageUrl={event.cover_image_url ?? undefined}
+      />
     </div>
   );
 }

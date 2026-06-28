@@ -3,7 +3,7 @@ import { PlusCircle, Link2 } from "lucide-react";
 
 import { createClient } from "@/lib/supabase/server";
 import { EventCard } from "@/components/event-card";
-import { MOCK_EVENTS_WITH_STATS } from "@/lib/mock/events.mock";
+import { getMyEventsAction } from "@/lib/events/event.actions";
 
 export default async function DashboardPage() {
   const supabase = await createClient();
@@ -16,9 +16,14 @@ export default async function DashboardPage() {
     user?.email?.split("@")[0] ??
     "사용자";
 
-  const upcomingEvents = MOCK_EVENTS_WITH_STATS.filter(
-    (e) => e.status === "recruiting" || e.status === "confirmed",
-  ).slice(0, 2);
+  // 실데이터 이벤트 목록 조회
+  const { data } = await getMyEventsAction();
+  const events = data ?? [];
+
+  // 다가오는 이벤트: recruiting 또는 confirmed 상태만 필터 후 최대 2개
+  const upcomingEvents = events
+    .filter((e) => e.status === "recruiting" || e.status === "confirmed")
+    .slice(0, 2);
 
   return (
     <div className="flex flex-col gap-8 p-4">

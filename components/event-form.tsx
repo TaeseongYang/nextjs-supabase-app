@@ -1,14 +1,21 @@
 "use client";
 
+import { useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { CoverImageUploader } from "@/components/cover-image-uploader";
+import {
+  createEventAction,
+  updateEventAction,
+} from "@/lib/events/event.actions";
 
 // 이벤트 폼 유효성 검사 스키마
 // max_participants는 HTML input에서 항상 string으로 들어오므로 string 타입으로 받은 뒤
@@ -20,7 +27,13 @@ const eventFormSchema = z.object({
     .max(100, "제목은 100자 이하입니다"),
   description: z.string().optional(),
   location: z.string().min(1, "장소를 입력하세요"),
-  event_date: z.string().min(1, "날짜를 선택하세요"),
+  event_date: z
+    .string()
+    .min(1, "날짜를 선택하세요")
+    .refine(
+      (val) => new Date(val) > new Date(),
+      "현재 시각 이후의 날짜를 선택하세요",
+    ),
   max_participants: z
     .string()
     .optional()
@@ -34,6 +47,7 @@ const eventFormSchema = z.object({
       },
       { message: "1 이상의 숫자를 입력하세요" },
     ),
+  cover_image_url: z.string().url().optional(),
 });
 
 // 폼 입력값 타입 (RHF에서 관리하는 상태 타입)
@@ -42,10 +56,19 @@ type EventFormValues = z.infer<typeof eventFormSchema>;
 interface EventFormProps {
   mode: "create" | "edit";
   defaultValues?: Partial<EventFormValues>;
+  // edit 모드에서 필수 — 수정 대상 이벤트 ID
+  eventId?: string;
+  defaultCoverImageUrl?: string;
 }
 
-export function EventForm({ mode, defaultValues }: EventFormProps) {
+export function EventForm({
+  mode,
+  defaultValues,
+  eventId,
+  defaultCoverImageUrl,
+}: EventFormProps) {
   const router = useRouter();
+  const [isPending, startTransition] = useTransition();
 
   const form = useForm<EventFormValues>({
     resolver: zodResolver(eventFormSchema),
@@ -55,21 +78,47 @@ export function EventForm({ mode, defaultValues }: EventFormProps) {
       location: "",
       event_date: "",
       max_participants: "",
+      cover_image_url: defaultCoverImageUrl ?? undefined,
       ...defaultValues,
     },
   });
 
-  // 폼 제출 핸들러: 검증 통과 후 데이터 처리
+  // 폼 제출 핸들러: 검증 통과 후 Server Action 호출
   function onSubmit(data: EventFormValues) {
     // max_participants를 숫자로 변환하여 최종 payload 구성
     const payload = {
-      ...data,
+      title: data.title,
+      description: data.description,
+      location: data.location,
+      // datetime-local 값을 ISO 8601 형식으로 변환
+      event_date: new Date(data.event_date).toISOString(),
       max_participants:
         data.max_participants === "" || data.max_participants === undefined
           ? undefined
           : Number(data.max_participants),
+      cover_image_url: data.cover_image_url,
     };
-    console.log("폼 제출:", payload);
+
+    startTransition(async () => {
+      if (mode === "create") {
+        const result = await createEventAction(payload);
+        if (result.error) {
+          toast.error(result.error);
+          return;
+        }
+        toast.success("이벤트가 생성되었습니다");
+        router.push(`/events/${result.data!.id}`);
+      } else {
+        const result = await updateEventAction(eventId!, payload);
+        if (result.error) {
+          toast.error(result.error);
+          return;
+        }
+        toast.success("이벤트가 수정되었습니다");
+        router.push(`/events/${eventId}`);
+        router.refresh();
+      }
+    });
   }
 
   return (
@@ -83,6 +132,17 @@ export function EventForm({ mode, defaultValues }: EventFormProps) {
         onSubmit={form.handleSubmit(onSubmit)}
         className="flex flex-col gap-5"
       >
+        {/* 커버 이미지 필드 */}
+        <div className="flex flex-col gap-2">
+          <Label>커버 이미지</Label>
+          <CoverImageUploader
+            value={form.watch("cover_image_url")}
+            onChange={(url) =>
+              form.setValue("cover_image_url", url, { shouldValidate: true })
+            }
+          />
+        </div>
+
         {/* 제목 필드 */}
         <div className="flex flex-col gap-2">
           <Label htmlFor="title">
@@ -171,7 +231,9 @@ export function EventForm({ mode, defaultValues }: EventFormProps) {
           <Button type="button" variant="outline" onClick={() => router.back()}>
             취소
           </Button>
-          <Button type="submit">저장</Button>
+          <Button type="submit" disabled={isPending}>
+            {isPending ? "저장 중..." : "저장"}
+          </Button>
         </div>
       </form>
     </div>

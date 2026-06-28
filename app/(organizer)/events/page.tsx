@@ -1,18 +1,21 @@
-import { redirect } from "next/navigation";
 import Link from "next/link";
 
 import { createClient } from "@/lib/supabase/server";
 import { DashboardEventList } from "@/components/dashboard-event-list";
 import { PageHeader } from "@/components/page-header";
-import { MOCK_EVENTS_WITH_STATS } from "@/lib/mock/events.mock";
+import { getMyEventsAction } from "@/lib/events/event.actions";
 
 export default async function EventsPage() {
   const supabase = await createClient();
-  const { data: claimsData, error: authError } =
-    await supabase.auth.getClaims();
-  if (authError || !claimsData?.claims) {
-    redirect("/auth/login");
-  }
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  const currentUserId = user?.id ?? "";
+
+  const { data, error } = await getMyEventsAction();
+
+  // 인증 실패 시 layout에서 처리 — 여기서는 빈 배열로 폴백
+  const events = data ?? [];
 
   return (
     <div className="flex flex-col gap-6">
@@ -27,7 +30,8 @@ export default async function EventsPage() {
           </Link>
         }
       />
-      <DashboardEventList events={MOCK_EVENTS_WITH_STATS} />
+      {error && <p className="text-sm text-destructive">{error}</p>}
+      <DashboardEventList events={events} currentUserId={currentUserId} />
     </div>
   );
 }
