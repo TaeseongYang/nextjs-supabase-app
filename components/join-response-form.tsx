@@ -1,11 +1,13 @@
 "use client";
 
+import { useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -14,30 +16,46 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { joinEventAction } from "@/lib/participants/participant.actions";
 
-// 참여 응답 폼 유효성 검사 스키마
+// 참여 응답 폼 유효성 검사 스키마 — 상태 선택만 필요
 const joinResponseSchema = z.object({
-  name: z.string().min(1, "이름을 입력하세요"),
-  phone: z.string().optional(),
   status: z.enum(["attending", "absent", "pending"]),
 });
 
 // 폼 입력값 타입
 type JoinResponseValues = z.infer<typeof joinResponseSchema>;
 
-export function JoinResponseForm() {
+interface JoinResponseFormProps {
+  token: string;
+  userName: string;
+}
+
+export function JoinResponseForm({ token, userName }: JoinResponseFormProps) {
+  const router = useRouter();
+  const [isPending, startTransition] = useTransition();
+
   const form = useForm<JoinResponseValues>({
     resolver: zodResolver(joinResponseSchema),
     defaultValues: {
-      name: "",
-      phone: "",
       status: "attending",
     },
   });
 
-  // 폼 제출 핸들러: 유효성 검사 통과 후 데이터 처리
+  // 폼 제출 핸들러: Server Action 호출
   function onSubmit(data: JoinResponseValues) {
-    console.log("참여 응답:", data);
+    startTransition(async () => {
+      const result = await joinEventAction(token, { status: data.status });
+
+      if (result.error) {
+        toast.error(result.error);
+        return;
+      }
+
+      toast.success("참여 신청이 완료되었습니다");
+      form.reset();
+      router.refresh();
+    });
   }
 
   return (
@@ -45,34 +63,13 @@ export function JoinResponseForm() {
       onSubmit={form.handleSubmit(onSubmit)}
       className="flex flex-col gap-5"
     >
-      {/* 이름 필드 (필수) */}
-      <div className="flex flex-col gap-2">
-        <Label htmlFor="name">
-          이름 <span className="text-destructive">*</span>
-        </Label>
-        <Input
-          id="name"
-          placeholder="이름을 입력하세요"
-          {...form.register("name")}
-        />
-        {form.formState.errors.name?.message && (
-          <p className="text-sm text-destructive">
-            {form.formState.errors.name.message}
-          </p>
-        )}
-      </div>
+      {/* 참여자 이름 안내 — 로그인 프로필 기반 */}
+      <p className="text-sm text-muted-foreground">
+        <span className="font-medium text-foreground">{userName}</span>님으로
+        참여 신청합니다
+      </p>
 
-      {/* 연락처 필드 (선택) */}
-      <div className="flex flex-col gap-2">
-        <Label htmlFor="phone">연락처</Label>
-        <Input
-          id="phone"
-          placeholder="010-0000-0000"
-          {...form.register("phone")}
-        />
-      </div>
-
-      {/* 참여 여부 필드 (필수) — shadcn Select를 RHF Controller로 연결 */}
+      {/* 참여 여부 선택 (필수) — shadcn Select를 RHF Controller로 연결 */}
       <div className="flex flex-col gap-2">
         <Label htmlFor="status">
           참여 여부 <span className="text-destructive">*</span>
@@ -100,9 +97,9 @@ export function JoinResponseForm() {
         )}
       </div>
 
-      {/* 제출 버튼 */}
-      <Button type="submit" className="w-full">
-        참여 응답 제출
+      {/* 제출 버튼 — 처리 중 비활성화 */}
+      <Button type="submit" className="w-full" disabled={isPending}>
+        {isPending ? "처리 중..." : "참여 신청"}
       </Button>
     </form>
   );

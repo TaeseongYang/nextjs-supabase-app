@@ -14,7 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { GoogleLoginButton } from "@/components/google-login-button";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 
 export function LoginForm({
@@ -26,6 +26,8 @@ export function LoginForm({
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const next = searchParams.get("next") ?? "/dashboard";
 
   const translateLoginError = (message: string): string => {
     if (message.includes("Invalid login credentials"))
@@ -49,7 +51,7 @@ export function LoginForm({
         password,
       });
       if (error) throw error;
-      router.push("/dashboard");
+      router.push(next);
     } catch (error: unknown) {
       setError(
         error instanceof Error

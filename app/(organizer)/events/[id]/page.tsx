@@ -9,6 +9,7 @@ import { InviteLinkButton } from "@/components/invite-link-button";
 import { EventDetailTabs } from "@/components/event-detail-tabs";
 import { EventStatusChanger } from "@/components/event-status-changer";
 import { getEventAction } from "@/lib/events/event.actions";
+import { getParticipantsByEventAction } from "@/lib/participants/participant.actions";
 import { formatEventDate } from "@/lib/utils";
 import type { EventStatus } from "@/lib/types/enums";
 
@@ -22,11 +23,17 @@ export default async function EventDetailPage({
   // Next.js 15 비동기 params 패턴
   const { id } = await params;
 
-  // Server Action으로 실데이터 조회 (소유권 검증 포함)
-  const { data: event, error } = await getEventAction(id);
+  // 이벤트 데이터와 참여자 목록을 병렬로 조회 — 성능 최적화
+  const [{ data: event, error }, participantsResult] = await Promise.all([
+    getEventAction(id),
+    getParticipantsByEventAction(id),
+  ]);
 
   // 이벤트 없음 or 권한 없음 → 404
   if (error || !event) notFound();
+
+  // 참여자 목록 — 실패 시 빈 배열로 폴백
+  const participants = participantsResult.data ?? [];
 
   return (
     <div className="flex flex-col gap-6">
@@ -77,10 +84,10 @@ export default async function EventDetailPage({
 
       <Separator />
 
-      {/* 탭 (공지 / 참여자 / 카풀 / 정산) — 참여자/카풀/정산은 Task 009에서 연동 예정 */}
+      {/* 탭 (공지 / 참여자 / 카풀 / 정산) — 참여자 실데이터 연동, 카풀/정산은 Task 010에서 처리 예정 */}
       <EventDetailTabs
         announcements={[]}
-        participants={[]}
+        participants={participants}
         carpools={[]}
         settlements={[]}
       />
