@@ -47,12 +47,18 @@ export async function updateSession(request: NextRequest) {
   const { data } = await supabase.auth.getClaims();
   const user = data?.claims;
 
-  const publicPaths = ["/", "/auth", "/join", "/admin/login"];
-  const isPublicPath = publicPaths.some(
-    (path) =>
-      request.nextUrl.pathname === path ||
-      request.nextUrl.pathname.startsWith(path + "/"),
+  const publicPaths = ["/", "/auth", "/admin/login"];
+  // /join/[token]/login 경로는 로그인 게이트이므로 인증 없이 접근 가능
+  const isJoinLoginPath = /^\/join\/[^/]+\/login$/.test(
+    request.nextUrl.pathname,
   );
+  const isPublicPath =
+    isJoinLoginPath ||
+    publicPaths.some(
+      (path) =>
+        request.nextUrl.pathname === path ||
+        request.nextUrl.pathname.startsWith(path + "/"),
+    );
 
   // 주최자 보호 경로 — 미인증 시 /auth/login으로 리디렉트
   const organizerProtectedPaths = ["/dashboard", "/events", "/profile"];

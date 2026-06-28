@@ -1,4 +1,4 @@
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
 import { CalendarDays, MapPin } from "lucide-react";
 import type { Metadata } from "next";
@@ -11,8 +11,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { formatEventDate } from "@/lib/utils";
 import { getJoinPageDataAction } from "@/lib/events/event.actions";
+import { getParticipantsByTokenAction } from "@/lib/participants/participant.actions";
+import { createClient } from "@/lib/supabase/server";
 
-// 게스트 초대 링크 페이지 — 토큰으로 이벤트를 조회하고 참여 응답을 받는다
+// 회원 전용 초대 링크 참여 페이지 — 로그인 사용자만 접근 가능
 interface JoinPageProps {
   params: Promise<{ token: string }>;
 }
@@ -64,11 +66,36 @@ export default async function JoinPage({ params }: JoinPageProps) {
   // Next.js 15 비동기 params 패턴
   const { token } = await params;
 
-  // 실데이터 조회 — 없으면 404
-  const { data } = await getJoinPageDataAction(token);
-  if (!data) notFound();
+  // 로그인 사용자 확인 — 미인증이면 게이트로 redirect
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-  const { event, announcements } = data;
+  if (!user) {
+    redirect(`/join/${token}/login`);
+  }
+
+  // 프로필에서 표시 이름 조회
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("full_name")
+    .eq("id", user.id)
+    .single();
+  const userName = profile?.full_name ?? user.email ?? "사용자";
+
+  // 이벤트 데이터와 참여자 목록을 병렬로 조회 — 성능 최적화
+  const [joinPageResult, participantsResult] = await Promise.all([
+    getJoinPageDataAction(token),
+    getParticipantsByTokenAction(token),
+  ]);
+
+  // 이벤트 없음 → 404
+  if (!joinPageResult.data) notFound();
+
+  const { event, announcements } = joinPageResult.data;
+  // 참여자 목록 — 실패 시 빈 배열로 폴백
+  const participants = participantsResult.data ?? [];
 
   return (
     <div className="flex flex-col gap-8">
@@ -101,20 +128,20 @@ export default async function JoinPage({ params }: JoinPageProps) {
         <AnnouncementsTab announcements={announcements} />
       </div>
 
-      {/* 3. 참여 응답 폼 섹션 (Card로 감싸기) */}
+      {/* 3. 참여 응답 폼 섹션 — 로그인 사용자 이름 전달 */}
       <Card>
         <CardHeader>
           <CardTitle>참여 응답</CardTitle>
         </CardHeader>
         <CardContent>
-          <JoinResponseForm />
+          <JoinResponseForm token={token} userName={userName} />
         </CardContent>
       </Card>
 
-      {/* 4. 참여자 현황 섹션 — Task 009에서 실데이터 연동 예정 */}
+      {/* 4. 참여자 현황 섹션 */}
       <div className="flex flex-col gap-3">
         <h2 className="text-lg font-semibold">참여 현황</h2>
-        <ParticipantStats participants={[]} />
+        <ParticipantStats participants={participants} />
       </div>
 
       {/* 5. 하단 네비게이션 */}
