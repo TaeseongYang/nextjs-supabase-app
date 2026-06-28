@@ -28,16 +28,20 @@ const FILTER_TABS: FilterTab[] = [
 
 interface DashboardEventListProps {
   events: EventWithStats[];
+  currentUserId: string;
 }
 
-export function DashboardEventList({ events }: DashboardEventListProps) {
+export function DashboardEventList({
+  events,
+  currentUserId,
+}: DashboardEventListProps) {
   // 현재 활성 필터 상태 — 초기값은 전체 보기
   const [activeFilter, setActiveFilter] = useState<FilterValue>("all");
 
-  // 선택한 필터에 따라 이벤트 목록 필터링
+  // 선택한 필터에 따라 이벤트 목록 필터링 — 전체 탭에서는 취소된 이벤트 제외
   const filteredEvents =
     activeFilter === "all"
-      ? events
+      ? events.filter((e) => e.status !== "cancelled")
       : events.filter((e) => e.status === activeFilter);
 
   return (
@@ -66,7 +70,11 @@ export function DashboardEventList({ events }: DashboardEventListProps) {
         ) : (
           <div className="flex flex-col gap-3">
             {filteredEvents.map((event) => (
-              <EventCard key={event.id} event={event} />
+              <EventCard
+                key={event.id}
+                event={event}
+                currentUserId={currentUserId}
+              />
             ))}
           </div>
         )}
